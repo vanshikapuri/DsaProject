@@ -1,181 +1,170 @@
-#include <iostream>
+#include<bits/stdc++.h>
 using namespace std;
 
-
-struct Node {
-    int data;
+class Node {
+public:
+    int key;
     Node* left;
     Node* right;
-    Node(int val) : data(val), left(nullptr), right(nullptr) {}
-};
 
-class BST {
-public:
-    BST() : root(nullptr) {}
-
-    void insert(int val) {
-        root = insertRec(root, val);
-    }
-
-    void deleteNode(int val) {
-        root = deleteRec(root, val);
-    }
-
-    bool search(int val) {
-        return searchRec(root, val);
-    }
-
-    void inorder() {
-        inorderRec(root);
-        cout << endl;
-    }
-
-    void preorder() {
-        preorderRec(root);
-        cout << endl;
-    }
-
-    void postorder() {
-        postorderRec(root);
-        cout << endl;
-    }
-
-private:
-    Node* root;
-
-    Node* insertRec(Node* node, int val) {
-        if (node == nullptr) {
-            return new Node(val);
-        }
-        if (val < node->data) {
-            node->left = insertRec(node->left, val);
-        } else if (val > node->data) {
-            node->right = insertRec(node->right, val);
-        }
-        return node;
-    }
-
-    Node* deleteRec(Node* node, int val) {
-        if (node == nullptr) return node;
-
-        if (val < node->data) {
-            node->left = deleteRec(node->left, val);
-        } else if (val > node->data) {
-            node->right = deleteRec(node->right, val);
-        } else {
-            if (node->left == nullptr) {
-                Node* temp = node->right;
-                delete node;
-                return temp;
-            } else if (node->right == nullptr) {
-                Node* temp = node->left;
-                delete node;
-                return temp;
-            }
-
-            Node* temp = minValueNode(node->right);
-            node->data = temp->data;
-            node->right = deleteRec(node->right, temp->data);
-        }
-        return node;
-    }
-
-    Node* minValueNode(Node* node) {
-        Node* current = node;
-        while (current && current->left != nullptr)
-            current = current->left;
-        return current;
-    }
-
-    bool searchRec(Node* node, int val) {
-        if (node == nullptr) return false;
-        if (node->data == val) return true;
-        if (val < node->data) return searchRec(node->left, val);
-        return searchRec(node->right, val);
-    }
-
-    void inorderRec(Node* node) {
-        if (node != nullptr) {
-            inorderRec(node->left);
-            cout << node->data << " ";
-            inorderRec(node->right);
-        }
-    }
-
-    void preorderRec(Node* node) {
-        if (node != nullptr) {
-            cout << node->data << " ";
-            preorderRec(node->left);
-            preorderRec(node->right);
-        }
-    }
-
-    void postorderRec(Node* node) {
-        if (node != nullptr) {
-            postorderRec(node->left);
-            postorderRec(node->right);
-            cout << node->data << " ";
-        }
+    Node(int key) {
+        this->key = key;
+        left = right = NULL;
     }
 };
+
+Node* insert(Node* root, int key) {
+    if (root == NULL) {     // if empty then create one
+        return new Node(key);
+    }
+    if (key < root->key) {      // if root > key then use left
+        root->left = insert(root->left, key);
+    } else {       // if root < key then use right
+        root->right = insert(root->right, key);
+    }
+    return root;
+}
+
+void inOrder(Node* root) {       // left key right
+    if (root == NULL) {
+        return;
+    }
+    inOrder(root->left);
+    cout << root->key << " ";
+    inOrder(root->right);
+}
+
+void preOrder(Node* root) {      // key left right
+    if (root == NULL) {
+        return;
+    }
+    cout << root->key << " ";
+    preOrder(root->left);
+    preOrder(root->right);
+}
+
+void postOrder(Node* root) {     // left right key
+    if (root == NULL) {
+        return;
+    }
+    postOrder(root->left);
+    postOrder(root->right);
+    cout << root->key << " ";
+}
+
+int sumOfNodes(Node* root) {
+    if (root == nullptr) {
+        return 0;
+    }
+
+    return root->key + sumOfNodes(root->left) + sumOfNodes(root->right);
+}
+
+bool search(Node* root, int key) {
+    if (root == NULL) {
+        return false;
+    }
+    if (root->key == key) {
+        return true;
+    }
+    if (key > root->key) {
+        return search(root->right, key);
+    }
+    return search(root->left, key);
+}
+
+Node* findMin(Node* root) {
+    while (root->left != NULL) {        // root->left coz left has small values than root
+        root = root->left;
+    }
+    return root;        // returns smallest root node
+}
+
+Node* remove(Node* root, int key) {
+    if (root == NULL) {
+        return NULL;
+    }
+    // To Find the Key 
+    else if (key < root->key) {
+        root->left = remove(root->left, key);
+    }
+    else if (key > root->key) {
+        root->right = remove(root->right, key);
+    }
+    else {
+        // When the Current Node Is Equal to Key
+
+        // No Children
+        if (root->left == NULL and root->right == NULL) {
+            delete root;
+            root = NULL;
+        }
+        // One Child
+        else if (root->left == NULL) {
+            Node* temp = root;
+            root = root->right;
+            delete temp;
+        }
+        else if (root->right == NULL) {
+            Node* temp = root;
+            root = root->left;
+            delete temp;
+        }
+        // Two Children
+        else {
+            Node* temp = findMin(root->right);     // finding inorder successor from right subtree
+
+            root->key = temp->key;        // copying inorder successor to key node
+
+            root->right = remove(root->right, temp->key);      // removing temp->key (temp is inorder successor) and the whole subtree is to right of root
+        }
+    }
+    return root;
+}
 
 int main() {
-    BST tree;
-    int choice = 1;
-    int value;
+    Node* root = NULL;
+    int n, key;
 
-    while (choice != 0) {
-        cout << "Binary Search Tree Operations:" << endl;
-        cout << "1. Insert element" << endl;
-        cout << "2. Delete element" << endl;
-        cout << "3. Search element" << endl;
-        cout << "4. Inorder traversal" << endl;
-        cout << "5. Preorder traversal" << endl;
-        cout << "6. Postorder traversal" << endl;
-        cout << "0. Exit" << endl;
-        cout << "Enter your choice: ";
-        cin >> choice;
-
-        switch (choice) {
-            case 1:
-                cout << "Enter value to be inserted: ";
-                cin >> value;
-                tree.insert(value);
-                break;
-            case 2:
-                cout << "Enter value to be deleted: ";
-                cin >> value;
-                tree.deleteNode(value);
-                break;
-            case 3:
-                cout << "Enter value to be searched: ";
-                cin >> value;
-                if (tree.search(value)) {
-                    cout << value << " is found in the tree." << endl;
-                } else {
-                    cout << value << " is not found in the tree." << endl;
-                }
-                break;
-            case 4:
-                cout << "Inorder traversal: ";
-                tree.inorder();
-                break;
-            case 5:
-                cout << "Preorder traversal: ";
-                tree.preorder();
-                break;
-            case 6:
-                cout << "Postorder traversal: ";
-                tree.postorder();
-                break;
-            case 0:
-                cout << "Exiting program..." << endl;
-                break;
-            default:
-                cout << "Invalid choice. Please enter again." << endl;
-        }
-        cout << endl;
+    cout << "Enter the number of elements to insert: ";
+    cin >> n;
+    cout << "Enter the elements:" << endl;
+    for (int i = 0; i < n; i++) {
+        cin >> key;
+        root = insert(root, key);
     }
+
+    cout << "Inorder Traversal gives: ";
+    inOrder(root);
+    cout << endl;
+
+    cout << "PostOrder Traversal gives: ";
+    postOrder(root);
+    cout << endl;
+
+    cout << "PreOrder Traversal gives: ";
+    preOrder(root);
+    cout << endl;
+
+    // Searching
+    cout << "Enter the key you want to search: ";
+    cin >> key;
+    if (search(root, key)) {
+        cout << "Key is present in Tree" << endl;
+    } else {
+        cout << "Key is not present in Tree" << endl;
+    }
+    cout << endl;
+
+    // Deletion
+    cout << "Enter the key you want to delete: ";
+    cin >> key;
+    root = remove(root, key);
+
+    cout << "After deletion, Inorder Traversal gives: ";
+    inOrder(root);
+    cout << endl;
 
     return 0;
 }
+
