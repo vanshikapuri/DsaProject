@@ -14,18 +14,18 @@ public:
 };
 
 Node* insert(Node* root, int key) {
-    if (root == NULL) {     // if empty then create one
+    if (root == NULL) {     
         return new Node(key);
     }
-    if (key < root->key) {      // if root > key then use left
+    if (key < root->key) {      
         root->left = insert(root->left, key);
-    } else {       // if root < key then use right
+    } else {       
         root->right = insert(root->right, key);
     }
     return root;
 }
 
-void inOrder(Node* root) {       // left key right
+void inOrder(Node* root) {       
     if (root == NULL) {
         return;
     }
@@ -34,7 +34,7 @@ void inOrder(Node* root) {       // left key right
     inOrder(root->right);
 }
 
-void preOrder(Node* root) {      // key left right
+void preOrder(Node* root) {      
     if (root == NULL) {
         return;
     }
@@ -43,7 +43,7 @@ void preOrder(Node* root) {      // key left right
     preOrder(root->right);
 }
 
-void postOrder(Node* root) {     // left right key
+void postOrder(Node* root) {     
     if (root == NULL) {
         return;
     }
@@ -74,17 +74,16 @@ bool search(Node* root, int key) {
 }
 
 Node* findMin(Node* root) {
-    while (root->left != NULL) {        // root->left coz left has small values than root
+    while (root->left != NULL) {        
         root = root->left;
     }
-    return root;        // returns smallest root node
+    return root;       
 }
 
 Node* remove(Node* root, int key) {
     if (root == NULL) {
         return NULL;
-    }
-    // To Find the Key 
+    } 
     else if (key < root->key) {
         root->left = remove(root->left, key);
     }
@@ -92,14 +91,10 @@ Node* remove(Node* root, int key) {
         root->right = remove(root->right, key);
     }
     else {
-        // When the Current Node Is Equal to Key
-
-        // No Children
         if (root->left == NULL and root->right == NULL) {
             delete root;
             root = NULL;
         }
-        // One Child
         else if (root->left == NULL) {
             Node* temp = root;
             root = root->right;
@@ -110,13 +105,10 @@ Node* remove(Node* root, int key) {
             root = root->left;
             delete temp;
         }
-        // Two Children
         else {
-            Node* temp = findMin(root->right);     // finding inorder successor from right subtree
-
-            root->key = temp->key;        // copying inorder successor to key node
-
-            root->right = remove(root->right, temp->key);      // removing temp->key (temp is inorder successor) and the whole subtree is to right of root
+            Node* temp = findMin(root->right);     
+            root->key = temp->key;       
+            root->right = remove(root->right, temp->key);      
         }
     }
     return root;
@@ -145,8 +137,7 @@ int main() {
     cout << "PreOrder Traversal gives: ";
     preOrder(root);
     cout << endl;
-
-    // Searching
+    
     cout << "Enter the key you want to search: ";
     cin >> key;
     if (search(root, key)) {
@@ -156,7 +147,6 @@ int main() {
     }
     cout << endl;
 
-    // Deletion
     cout << "Enter the key you want to delete: ";
     cin >> key;
     root = remove(root, key);
